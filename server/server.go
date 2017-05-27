@@ -17,22 +17,9 @@ var Port = 7000
 func Start(logger *log.Logger, quit chan<- bool) {
 	muxRouter := mux.NewRouter()
 
-	var notFoundHandler http.HandlerFunc = func(respWriter http.ResponseWriter, req *http.Request) {
-		respWriter.WriteHeader(404)
-		respWriter.Write([]byte("Oops. Page not found."))
-	}
-	muxRouter.NotFoundHandler = logRequestResponse(notFoundHandler, logger)
-
-	var readyHandler http.HandlerFunc = func(respWriter http.ResponseWriter, req *http.Request) {
-		respWriter.WriteHeader(204)
-	}
-	muxRouter.Handle("/ready", logRequestResponse(readyHandler, logger)).Methods("GET")
-
-	var closeHandler http.HandlerFunc = func(respWriter http.ResponseWriter, req *http.Request) {
-		logger.Println("Closing server.")
-		quit <- true
-	}
-	muxRouter.Handle("/close", logRequestResponse(closeHandler, logger)).Methods("POST")
+	muxRouter.NotFoundHandler = logRequestResponse(&notFoundHandler{}, logger)
+	muxRouter.Handle("/ready", logRequestResponse(&readyHandler{}, logger)).Methods("GET")
+	muxRouter.Handle("/close", logRequestResponse(&closeHandler{quit, logger}, logger)).Methods("POST")
 
 	startServer(muxRouter, logger)
 }
