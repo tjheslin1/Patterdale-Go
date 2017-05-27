@@ -53,6 +53,6 @@ func startServer(handler http.Handler, logger *log.Logger) {
 
 func check(err error, logger *log.Logger) {
 	if err != nil {
-		logger.Printf("Error occured handling request:\n'%v", err)
+		logger.Printf("Error occured handling request:\n'%v'", err)
 	}
 }
