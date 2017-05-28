@@ -31,14 +31,15 @@ func (dbClient *OracleDBClient) Connect(dataSourceName string, logger *log.Logge
 		logger.Printf("Error connecting to the database: %s\n", err)
 		return
 	}
+	dbClient.dbHandle = db
 }
 
 // HealthCheck performs a simple query against the Oracle database.
+// Returning the success of the check.
 func (dbClient *OracleDBClient) HealthCheck() bool {
 	rows, err := dbClient.dbHandle.Query("SELECT 2+2 FROM dual")
 	if err != nil {
-		dbClient.Logger.Println("Error during health check")
-		dbClient.Logger.Println(err)
+		dbClient.Logger.Printf("Error during health check.\n%v\n", err)
 		return false
 	}
 	defer rows.Close()
